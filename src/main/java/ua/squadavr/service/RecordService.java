@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @Service
 public class RecordService {
     private final RecordDao recordDao;
-    private int id = 3;
 
     @Autowired
     public RecordService(RecordDao recordDao) {
@@ -45,8 +44,11 @@ public class RecordService {
 
     public void saveRecord(String title) {
         if (title != null && !title.isBlank()) {
-            recordDao.saveRecord(new Record(title, id));
-            id++;
+            Record newRecord = new Record();
+            newRecord.setStatus(RecordStatus.ACTIVE);
+            newRecord.setTitle(title);
+
+            recordDao.saveRecord(newRecord);
         }
     }
 

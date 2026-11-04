@@ -24,12 +24,14 @@ public class CommonController {
     }
     @RequestMapping("/")
     public String redirectToHomePage(){
+        System.out.println("Redirecting to home from / Mapping");
         return "redirect:/home";
     }
 
 
     @RequestMapping("/home")
     public String getMainPage(@RequestParam(name = "filter", required = false) String filterMode, Model model){
+        System.out.println("Home");
         RecordsContainerDto container = recordService.findAllRecords(filterMode);
         model.addAttribute("numberOfDoneRecords", container.getNumberOfDoneRecords());
         model.addAttribute("numberOfActiveRecords", container.getNumberOfActiveRecords());
@@ -38,20 +40,20 @@ public class CommonController {
     }
 
     @RequestMapping(value = "/add-record", method = RequestMethod.POST)
-    public String addRecord(@RequestParam String title){
+    public String addRecord(@RequestParam("title") String title){
         recordService.saveRecord(title);
         return "redirect:/home";
     }
 
     @RequestMapping(value = "/make-record-done", method = RequestMethod.POST)
-    public String makeRecordDone(@RequestParam int id,
+    public String makeRecordDone(@RequestParam("id") int id,
                                  @RequestParam(name = "filter", required = false) String filterMode){
         recordService.updateRecordStatus(id, RecordStatus.DONE);
         return "redirect:/home" + (filterMode != null && !filterMode.isBlank() ? "?filter=" + filterMode : "");
     }
 
     @RequestMapping(value = "/delete-record", method = RequestMethod.POST)
-    public String deleteRecord(@RequestParam int id,
+    public String deleteRecord(@RequestParam("id") int id,
                                @RequestParam(name = "filter", required = false) String filterMode){
         recordService.deleteRecord(id);
         return "redirect:/home" + (filterMode != null && !filterMode.isBlank() ? "?filter=" + filterMode : "");

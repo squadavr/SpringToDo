@@ -1,21 +1,24 @@
 package ua.squadavr.entity;
 
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "records")
 public class Record {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private final String title;
+
+    @Column(name = "title", nullable = false, length = 50)
+    private String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private RecordStatus status;
-    public Record(int id,String title, RecordStatus status) {
-        this.id = id;
-        this.title = title;
-        this.status = status;
+
+    public Record() {
     }
 
-    public Record(String title, int id){
-        this.id = id;
-        this.title = title;
-        this.status = RecordStatus.ACTIVE;
-    }
 
     public int getId() {
         return id;
@@ -23,6 +26,10 @@ public class Record {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getTitle() {

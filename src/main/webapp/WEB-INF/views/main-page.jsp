@@ -80,7 +80,7 @@
                         <div class="hint">
                             <span>There are no active tasks!</span>
                         </div>
-                    </c:when
+                    </c:when>
                     <c:when test="${fn:toLowerCase(param.filter) == 'done'}">
                         <div class="hint">
                             <span>There are no done tasks!</span>

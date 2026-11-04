@@ -9,63 +9,107 @@
     <name>TodoList Application</name>
 
     <properties>
-        <spring.version>5.3.29</spring.version>
-        <servlet.version>4.0.1</servlet.version>
-        <jstl.version>1.2</jstl.version>
+        <spring.version>6.1.16</spring.version>
+        <servlet.version>6.0.0</servlet.version>
+        <jstl.version>3.0.1</jstl.version>
+        <postgresql.version>42.7.14</postgresql.version>
+        <hibernate.version>6.5.2.Final</hibernate.version>
+        <jakarta.version>3.1.0</jakarta.version>
     </properties>
 
     <dependencies>
-
-
+        <!-- Spring MVC -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Servlet API -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/jstl/jstl -->
+
+        <!-- JSTL API & Implementation for Tomcat 10 / Jakarta EE -->
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>${jstl.version}</version>
             <scope>compile</scope>
         </dependency>
 
+        <!-- Database & Hibernate -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+
     <build>
         <finalName>ROOT</finalName>
         <plugins>
-        <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>run</goal>
-                    </goals>
-                    <configuration>
-                        <target>
-                            <copy
-                                    file="${project.build.directory}/${project.build.finalName}.war"
-                                    tofile="F:/apache-tomcat-9.0.120/webapps/ROOT.war"/>
-                        </target>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy
+                                        file="${project.build.directory}/${project.build.finalName}.war"
+                                        tofile="F:/apache-tomcat-10.1.61/webapps/ROOT.war"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
         </plugins>

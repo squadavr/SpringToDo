@@ -1,6 +1,11 @@
 package ua.squadavr.dao;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import ua.squadavr.config.ApplicationContextProvider;
 import ua.squadavr.entity.Record;
 import ua.squadavr.entity.RecordStatus;
 
@@ -10,16 +15,20 @@ import java.util.List;
 
 @Repository
 public class RecordDao {
-    private final List<Record> records = new ArrayList<>(
-            Arrays.asList(
-                    new Record(0,"Learn to code", RecordStatus.ACTIVE),
-                    new Record(1,"Go to the gym", RecordStatus.DONE),
-                    new Record(2,"Buy a flowers", RecordStatus.DONE)
-            )
-    );
+    private EntityManagerFactory entityManagerFactory;
 
-    public List<Record> findAllRecords(){
-        return new ArrayList<>(records);
+    @Autowired
+    public RecordDao(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+    }
+
+
+
+    public List<Record> findAllRecords() {
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            Query query = entityManager.createQuery("FROM Record");
+            return query.getResultList();
+        }
     }
 
 //    public List<Record> findActiveRecords(){
@@ -34,20 +43,78 @@ public class RecordDao {
 //    }
 
 
-    public void saveRecord(Record record){
-        records.add(record);
-    }
+    public void saveRecord(Record record) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.persist(record);
 
-    public void updateRecordStatus(int id, RecordStatus newStatus){
-        for (Record item : records){
-            if (item.getId() == id){
-                item.setStatus(newStatus);
-                break;
+            entityManager.getTransaction().commit();
+        } catch (Exception e){
+            System.out.println("Exception caught, executing rollback");
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
+        } finally {
+            entityManager.close();
         }
     }
 
-    public void deleteRecord(int id){
-        records.removeIf(item -> item.getId() == id);
+    public void updateRecordStatus(int id, RecordStatus newStatus) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            entityManager.getTransaction().begin();
+            Record foundRecord = entityManager.find(Record.class, id);
+            if (foundRecord != null) {
+                foundRecord.setStatus(newStatus);
+                entityManager.merge(foundRecord);
+            }
+            entityManager.getTransaction().commit();
+        } catch (Exception e){
+            System.out.println("Exception caught, executing rollback");
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public void deleteRecord(int id) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            entityManager.getTransaction().begin();
+            Record foundRecord = entityManager.find(Record.class, id);
+            if (foundRecord != null) {
+                entityManager.remove(foundRecord);
+            }
+            entityManager.getTransaction().commit();
+        } catch (Exception e){
+            System.out.println("Exception caught, executing rollback");
+            e.printStackTrace();
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+        } finally {
+            entityManager.close();
+        }
     }
 }
+
+/*
+public void templateWithTransactions(Record record){
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    try{
+        entityManager.getTransaction().begin();
+
+        entityManager.getTransaction().commit();
+    } catch (Exception e){
+        System.out.println("Exception caught, executing rollback");
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
+    } finally {
+        entityManager.close();
+    }
+}
+ */
